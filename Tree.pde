@@ -33,8 +33,10 @@ class Tree
   void draw()
   {
     // 1. Low speed disabled drawing
-    if(speed <= MINSPEED)
+    if(speed <= MINSPEED || branches >= BRANCH_MAXIMUM_COUNT)
       return;
+      
+    println(branches);
     
     // 2. Draw the branches if they exist (recursively)
     for(int i = 0; i < numLines; i++)
@@ -67,7 +69,9 @@ class Tree
         final int newNumLines = max(numLines - BRANCH_COUNT_REDUCTION, 0);
        
         // Create a new branch (Tree)
-        trees[i] = new Tree((int)positions[i].x, (int)positions[i].y, speed, newNumLines );  
+        trees[i] = new Tree((int)positions[i].x, (int)positions[i].y, speed, newNumLines ); 
+        trees[i].topLevelTree = topLevelTree;
+        topLevelTree.branches += newNumLines;
         
         // Generate new angle for each branch
         for(int j = 0; j < newNumLines; j++)
@@ -82,6 +86,9 @@ class Tree
   
   // The speed in pixels at which this tree is drawn
   private float speed;
+  
+  private Tree topLevelTree = this;
+  private int branches = 0;
   
   // Amount of branches to draw
   private final int numLines;
