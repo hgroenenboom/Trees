@@ -2,25 +2,25 @@ final float TWOPI = 6.32f;
 
 // ALL THESE PARAMETERS SHOULD BECOME ACCESIBLE VIA AN INTERFACE (WITH SLIDERS OR SOMEHTING):
 
-final float BRANCH_ANGLE_OFFSET = 1.0f; // DEF: 1
-final float BRANCHING_CHANCE = 3.5f / 100.0f; // DEF: 0.02 (2%)
-final float BRANCH_MOVEMENT = 0.2f; // DEF: 0.2
-final int BRANCH_COUNT = 3; // DEF: 3
-final float WIDTH_EXPANSION = 1.0f + 0.2f; // DEF: 1.0f;
-final float WIDTH_MULTIPLIER = 0.2f; // DEF: 1.0f;
-final int BRANCH_COUNT_REDUCTION = 0; // DEF: 1
+final float BRANCH_ANGLE_OFFSET = 0.1f; // DEF: 1
+final float BRANCHING_CHANCE = 7.0f / 100.0f; // DEF: 0.02 (2%)
+final float BRANCH_MOVEMENT = 0.4f; // DEF: 0.2
+final int BRANCH_COUNT = 6; // DEF: 3
+final float WIDTH_EXPANSION = 1.0f + 1.0f; // DEF: 1.0f;
+final float WIDTH_MULTIPLIER = 0.05f; // DEF: 1.0f;
+final int BRANCH_COUNT_REDUCTION = 2; // DEF: 1
 final float ALPHA = 0.0f;
 
-final float INIT_SPEED = 6.0f; // DEF: 5
+final float INIT_SPEED = 20.0f; // DEF: 5
 final float MINSPEED = 0.1f; // DEF: 0.1
-final float SPEED_MULTIPLIER = 0.95; // DEF: 1
+final float SPEED_MULTIPLIER = 0.96; // DEF: 1
 final float SPEED_INCREMENT = -0.0; // DEF: -0.1
 final float SPEED_RANDOM_DEV = 0.0f; // DEF: 0.05
 
 class Vector
 {
-  public float x = 1.0f, y;
-  public float angle;
+  public float x = 1.0f, y = 0.0f;
+  public float angle = 0.0f;
   
   Vector(float x, float y)
   {
@@ -111,9 +111,11 @@ class Tree
       
       if(random(0.0f, 1.0f) < BRANCHING_CHANCE)
       {
-        trees[i] = new Tree((int)positions[i].x, (int)positions[i].y, speed, numLines - BRANCH_COUNT_REDUCTION);  
+        final int newNumLines = max(numLines - BRANCH_COUNT_REDUCTION, 0);
         
-        for(int j = 0; j < numLines - 1; j++)
+        trees[i] = new Tree((int)positions[i].x, (int)positions[i].y, speed, newNumLines );  
+        
+        for(int j = 0; j < newNumLines; j++)
         {
           // Apply new branch angle offset
           trees[i].directions[j].changeAngle(directions[i].angle + random(-BRANCH_ANGLE_OFFSET, BRANCH_ANGLE_OFFSET));
