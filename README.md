@@ -7,8 +7,8 @@ Processing patch for generating tree structures
 
 Features
 - Interactive UI
-- Persistance of settings
-- Automation of parameters
+- Persistance for parameter settings (serialization)
+- Automation / motion of parameters
 
 Art
 - Colours
