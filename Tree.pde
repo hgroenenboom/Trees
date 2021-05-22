@@ -9,11 +9,18 @@ class Tree
     * @param speedInPixels    The starting drawing speed (in pixesl) of the Tree
     * @param numLines         The amount of lines/branches to spawn of the origin point
   */
-  Tree(int x, int y, float speedInPixels, int numLines)
+  Tree(int x, int y, float speedInPixels, int numLines, float crossFade)
   {
     // Init variables
     this.numLines = numLines;
     this.speed = speedInPixels;
+    this.crossFade = crossFade;
+    
+    // Create two random lists with custom seeds
+    final int RANDOM_SIZE = 3;
+    randomLists = new RandomList[2];
+    randomLists[0] = new RandomList(0, RANDOM_SIZE);
+    randomLists[1] = new RandomList(1, RANDOM_SIZE);
     
     // Initialize data structures
     directions = new Vector[numLines];
@@ -23,7 +30,7 @@ class Tree
     for(int i = 0; i < numLines; i++)
     {
       // Create random directions
-      directions[i] = new Vector(- random(0.0f, TWO_PI));
+      directions[i] = new Vector(- randomOfTwo(0.0f, TWO_PI, crossFade));
       
       // Set inital line positions on centre point
       positions[i] = new Vector(x, y);
@@ -31,12 +38,10 @@ class Tree
   }
   
   void draw()
-  {
+  {    
     // 1. Low speed disabled drawing
     if(speed <= MINSPEED || branches >= BRANCH_MAXIMUM_COUNT)
       return;
-      
-    println(branches);
     
     // 2. Draw the branches if they exist (recursively)
     for(int i = 0; i < numLines; i++)
@@ -61,27 +66,32 @@ class Tree
       line(oldX, oldY, positions[i].x, positions[i].y);
       
       // iv. Add variation to the target angle of the branch
-      directions[i].angle += random( - BRANCH_MOVEMENT, BRANCH_MOVEMENT );
+      directions[i].angle += randomOfTwo( - BRANCH_MOVEMENT, BRANCH_MOVEMENT, crossFade );
       
       // v. Let chance decide whether whether this branch branches into new branches
-      if(random(0.0f, 1.0f) < BRANCHING_CHANCE)
+      if(randomOfTwo(0.0f, 1.0f, crossFade) < BRANCHING_CHANCE)
       {
         final int newNumLines = max(numLines - BRANCH_COUNT_REDUCTION, 0);
        
         // Create a new branch (Tree)
-        trees[i] = new Tree((int)positions[i].x, (int)positions[i].y, speed, newNumLines ); 
+        trees[i] = new Tree((int)positions[i].x, (int)positions[i].y, speed, newNumLines, crossFade ); 
         trees[i].topLevelTree = topLevelTree;
         topLevelTree.branches += newNumLines;
         
         // Generate new angle for each branch
         for(int j = 0; j < newNumLines; j++)
-          trees[i].directions[j].changeAngle(directions[i].angle + random(-BRANCH_ANGLE_OFFSET, BRANCH_ANGLE_OFFSET));
+          trees[i].directions[j].changeAngle(directions[i].angle + randomOfTwo(-BRANCH_ANGLE_OFFSET, BRANCH_ANGLE_OFFSET, crossFade));
       }
     }
     
     // Adjust speed (usually decrease, otherwise the branch will forever keep drawing, and a branch should eventually stop growing is the idea)
-    speed += random(SPEED_INCREMENT - SPEED_RANDOM_DEV, SPEED_INCREMENT + SPEED_RANDOM_DEV);
+    speed += randomOfTwo(SPEED_INCREMENT - SPEED_RANDOM_DEV, SPEED_INCREMENT + SPEED_RANDOM_DEV, crossFade);
     speed *= SPEED_MULTIPLIER;
+  }
+  
+  float randomOfTwo(float min, float max, float crossfade)
+  {
+     return (1.0f - crossfade) * randomLists[0].get(min, max) + crossfade * randomLists[1].get(min, max);
   }
   
   // The speed in pixels at which this tree is drawn
@@ -92,6 +102,10 @@ class Tree
   
   // Amount of branches to draw
   private final int numLines;
+  
+  /** Crossfade amount between the two randoms, can be used in combination with a random seed to create similar copies of a single tree */
+  RandomList[] randomLists;
+  private final float crossFade;
   
   // Directions (angles) and line positions for this tree
   private Vector[] directions;
