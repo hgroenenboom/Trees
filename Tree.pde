@@ -1,5 +1,5 @@
 
-class Tree
+class MorphingTree
 {
   /** A Tree origin of which branches are drawn. A Tree can contain multiple Tree's which are essentially subbranches.
     * The draw call recursively calls all the subtrees to also draw when necessary.
@@ -9,7 +9,7 @@ class Tree
     * @param speedInPixels    The starting drawing speed (in pixesl) of the Tree
     * @param numLines         The amount of lines/branches to spawn of the origin point
   */
-  Tree(int x, int y, float speedInPixels, int numLines, float crossFade)
+  MorphingTree(int x, int y, float speedInPixels, int numLines, float crossFade, int randomSize)
   {
     // Init variables
     this.numLines = numLines;
@@ -17,15 +17,15 @@ class Tree
     this.crossFade = crossFade;
     
     // Create two random lists with custom seeds
-    final int RANDOM_SIZE = 3;
+    this.randomArraySize = randomSize;
     randomLists = new RandomList[2];
-    randomLists[0] = new RandomList(0, RANDOM_SIZE);
-    randomLists[1] = new RandomList(1, RANDOM_SIZE);
+    randomLists[0] = new RandomList(0, randomArraySize);
+    randomLists[1] = new RandomList(1, randomArraySize);
     
     // Initialize data structures
     directions = new Vector[numLines];
     positions = new Vector[numLines];
-    trees = new Tree[numLines];
+    trees = new MorphingTree[numLines];
     
     for(int i = 0; i < numLines; i++)
     {
@@ -74,7 +74,7 @@ class Tree
         final int newNumLines = max(numLines - BRANCH_COUNT_REDUCTION, 0);
        
         // Create a new branch (Tree)
-        trees[i] = new Tree((int)positions[i].x, (int)positions[i].y, speed, newNumLines, crossFade ); 
+        trees[i] = new MorphingTree((int)positions[i].x, (int)positions[i].y, speed, newNumLines, crossFade, randomArraySize ); 
         trees[i].topLevelTree = topLevelTree;
         topLevelTree.branches += newNumLines;
         
@@ -97,7 +97,7 @@ class Tree
   // The speed in pixels at which this tree is drawn
   private float speed;
   
-  private Tree topLevelTree = this;
+  private MorphingTree topLevelTree = this;
   private int branches = 0;
   
   // Amount of branches to draw
@@ -105,6 +105,7 @@ class Tree
   
   /** Crossfade amount between the two randoms, can be used in combination with a random seed to create similar copies of a single tree */
   RandomList[] randomLists;
+  public final int randomArraySize;
   private final float crossFade;
   
   // Directions (angles) and line positions for this tree
@@ -112,5 +113,5 @@ class Tree
   private Vector[] positions;
   
   // Sub trees for this tree segment
-  private Tree[] trees; 
+  private MorphingTree[] trees; 
 }
